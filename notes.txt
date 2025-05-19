@@ -1,0 +1,11 @@
+let vs var
+
+var 
+global when declared outside of function
+function scoped when declared inside of function
+can be re-declared and updated
+
+let
+block scoped {this is a block}
+cannot be re-declared in the same block
+can be updated (within the block)

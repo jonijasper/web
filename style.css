@@ -1,9 +1,20 @@
+/*
 #idref {
     color: orange
 }
 
 .classref {
     color: blue
+}
+*/
+
+
+/* Global variables: */
+:root {
+    --n-houses: 0;
+    --grid-gap: 1vw;
+    --padding: 1vw;
+    --aspect-ratio: calc(var(--n-houses+2)/2);
 }
 
 .header {
@@ -13,21 +24,27 @@
 #gameboard {
     display: grid;
     grid-template-areas: 
-        "a b b b b d"
-        "a c c c c d";
-    grid-template-rows: 1fr 1fr;
-    grid-template-columns: repeat(6,1fr);
-    gap: 10px;
-    padding: 10px;
+        "As Af Bs"
+        "As Bf Bs";
+    grid-template-columns: 1fr var(--n-houses)*1fr 1fr;
+    aspect-ratio: var(--aspect-ratio);
+    gap: var(--grid-gap);
 }
 
-#gameboard > div {
-    background-color: gray;
-    text-align: center;
-    padding: 20px;
+#A-store { grid-area: As }
+#A-field { grid-area: Af }
+#B-store { grid-area: Bs }
+#B-field { grid-area: Bf }
+
+.field {
+    display: grid;
+    grid-template-columns: repeat(var(--n-houses), 1fr);
+    gap: var(--grid-gap);
 }
 
-.a { grid-area: a; }
-.b { grid-area: b; }
-.c { grid-area: c; }
-.d { grid-area: d; }
+.house {
+    display: flex;
+    background-color: grey;
+}
+
+

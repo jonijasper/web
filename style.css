@@ -6,12 +6,28 @@
     color: blue
 }
 
-.text {
-    font-family: sans-serif;
-    font-size: xx-large;
+.header {
     text-align: center;
 }
 
 #gameboard {
     display: grid;
+    grid-template-areas: 
+        "a b b b b d"
+        "a c c c c d";
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: repeat(6,1fr);
+    gap: 10px;
+    padding: 10px;
 }
+
+#gameboard > div {
+    background-color: gray;
+    text-align: center;
+    padding: 20px;
+}
+
+.a { grid-area: a; }
+.b { grid-area: b; }
+.c { grid-area: c; }
+.d { grid-area: d; }

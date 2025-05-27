@@ -1,13 +1,6 @@
-const spandex = document.getElementById("id2");
+const gameboard = document.getElementById("gameboard");
 
-function dostuff() {
-    spandex.textContent = "pöö";
-}
-
-buttonwithid = document.getElementById("button1");
-buttonwithid.addEventListener("click",undostuff);
-
-function undostuff() {
-    spandex.textContent = "";
+function resetboard() {
+    gameboard.textContent = "pöö";
 }
 

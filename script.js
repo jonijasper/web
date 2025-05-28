@@ -99,8 +99,8 @@ class HouseList {
         BLOCKED = true;
 
         let house = this.getHouseById(clickedHouse.id);
-        let beans = house.beans;
-        textbox.textContent = beans;
+        let mrBeans = house.beans;
+        textbox.textContent = mrBeans;
 
         // empty house
         house.beans = 0;
@@ -108,16 +108,16 @@ class HouseList {
         clickedHouse.textContent = 0;
 
         // spread the beans
-        while (beans) {
+        while (mrBeans) {
             await delay();
             house = house.next;
             house.beans++;
-            beans--;
+            mrBeans--;
 
             const houseEl = document.getElementById(house.ID);
             houseEl.value = house.beans;
             houseEl.textContent = house.beans;
-            textbox.textContent = beans;
+            textbox.textContent = mrBeans;
         }
         
         BLOCKED = false;

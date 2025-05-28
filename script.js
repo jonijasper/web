@@ -1,3 +1,8 @@
+// TODO:
+// - when landing on empty house on homefield, get opponents
+//   beans from opposite house
+// - handle player turns and prevent clicking opponents houses
+
 const INITBEANS = 4;
 const MAXHOUSES = 6;
 document.documentElement.style.setProperty('--n-houses', MAXHOUSES);

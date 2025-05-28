@@ -26,7 +26,7 @@
     grid-template-areas: 
         "As Af Bs"
         "As Bf Bs";
-    grid-template-columns: 1fr var(--n-houses)*1fr 1fr;
+    grid-template-columns: 1fr 6fr 1fr;
     aspect-ratio: var(--aspect-ratio);
     gap: var(--grid-gap);
 }
@@ -44,7 +44,24 @@
 
 .house {
     display: flex;
+    align-content: center;
+    justify-content: center;
     background-color: grey;
+    cursor: pointer;
 }
 
+.store {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    background-color: grey;
+    cursor: default;
+}
+
+
+#message {
+    text-align: center;
+    margin: 80% 50% 10% 25%;
+    border: 2px solid black;
+}
 

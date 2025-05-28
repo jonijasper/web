@@ -1,39 +1,42 @@
 const INITBEANS = 4;
 const MAXHOUSES = 6;
+document.documentElement.style.setProperty('--n-houses', MAXHOUSES);
+
+// beanspread animation
+const FPS = 2;
+const delay = () => {
+    return new Promise((resolve) => {
+        setTimeout(() => {resolve();}, 1000/FPS);
+    });
+};
+let BLOCKED = false; // for blocking clicks while beanspreading
+
+// html elements
 const Afield = document.getElementById("A-field");
 const Bfield = document.getElementById("B-field");
 const Astore = document.getElementById("A-store");
-const Bstore = document.getElementById("B-store")
+const Bstore = document.getElementById("B-store");
+const textbox = document.getElementById("message");
 
-document.documentElement.style.setProperty('--n-houses', MAXHOUSES);
-
+// classes
 class House {
-    constructor(houseID) {
-        this.name=houseID;
-        this.value=INITBEANS;
+    constructor(houseID, beans) {
+        this.ID=houseID;
+        this.beans=beans;
         this.next=null;
     }
 }
-
-class Store {
-    constructor(storeID) {
-        this.name=storeID;
-        this.value=0;
-        this.next=null;
-    }
-}
-
 
 class HouseList {
     constructor() {
-        this.first=null;
+        this.first = null;
     }
 
     getLastHouse() {
         if (this.first) {
             let house = this.first;
-            while(house.next) { 
-            house = house.next; 
+            while (house.next) {
+                house = house.next;
             }
             return house;
         } else {
@@ -41,52 +44,123 @@ class HouseList {
         }
     }
 
-    addHouse(houseID, field) {
-        let newHouse = new House(houseID);
+    getHouseById(houseID) {
+        let house = this.first;
+        let i = 0;
+        while (house.ID != houseID) {
+            i++;
+            house = house.next;
+            if (i == 50) {
+                textbox.textContent = `infinite loop! houseID: ${houseID}`;
+                return;
+            }
+        }
+        return house;
+    }
+
+    addHouse(houseID) {
+        let newHouse = new House(houseID, INITBEANS);
         let house = this.getLastHouse();
-        if(house) {
+        if (house) {
             house.next = newHouse;
         } else {
             this.first = newHouse;
         }
         const houseElement = document.createElement("div");
-        houseElement.className="house";
-        field.appendChild(houseElement);
-        houseElement.textContent=`${newHouse.value}`;
+        houseElement.className = "house";
+        houseElement.id = newHouse.ID;
+        houseElement.value = newHouse.beans;
+        houseElement.textContent = newHouse.beans;
+
+        // debugline
+        // houseElement.textContent = newHouse.ID;
+
+        return houseElement;
     }
 
-    addStore(storeID, field) {
-        let newStore = new Store(storeID);
+    addStore(field) {
+        let newStore = new House(field.id, 0);
         let house = this.getLastHouse();
-        if(house) {
+        if (house) {
             house.next = newStore;
         } else {
             this.first = newStore;
         }
-        field.textContent = `${newStore.value}`;
-
+        field.value = newStore.beans;
+        field.textContent = newStore.beans;
     }
 
+    async beanSpread(e) {
+        if (BLOCKED) {
+            return;
+        }
+        const clickedHouse = e.target;
+
+        BLOCKED = true;
+
+        let house = this.getHouseById(clickedHouse.id);
+        let beans = house.beans;
+        textbox.textContent = beans;
+
+        // empty house
+        house.beans = 0;
+        clickedHouse.value = 0;
+        clickedHouse.textContent = 0;
+
+        // spread the beans
+        while (beans) {
+            await delay();
+            house = house.next;
+            house.beans++;
+            beans--;
+
+            const houseEl = document.getElementById(house.ID);
+            houseEl.value = house.beans;
+            houseEl.textContent = house.beans;
+            textbox.textContent = beans;
+        }
+        
+        BLOCKED = false;
+    }
 }
 
-function initBoard() {
-    const board = new HouseList();
+function reset() {
     Afield.innerHTML = "";
     Bfield.innerHTML = "";
-    board.addStore('Astore', Astore);
-    for (let i=0; i < MAXHOUSES; i++) {
-        board.addHouse(`B${i}`, Bfield);
-    }
-
-    board.addStore('Bstore', Bstore);
-    for (let i=0; i < MAXHOUSES; i++) {
-        board.addHouse(`A${i}`, Afield);
-    }
-
-    let lastHouse = board.getLastHouse();
-    if (lastHouse) {
-        lastHouse.next = board.first;
-    }
+    textbox.textContent = "-";
+    main();
 }
 
-initBoard();
+// main program
+function main() {
+    // creates divs for houses and inserts to A and B html field elements
+    //
+    // houses and stores saved as looped linked list (HouseList) 
+    // for easy beanspreading:
+    //     Astore -> Bhouses -> Bstore -> Ahouses -> Astore
+    //
+    const board = new HouseList();
+    board.addStore(Astore);
+    for (let i=0; i < MAXHOUSES; i++) {
+        const newhouse = board.addHouse(`B${i}`);
+        newhouse.addEventListener("click", (e) => {
+            board.beanSpread(e);
+        });
+
+        Bfield.appendChild(newhouse);
+    }
+
+    board.addStore(Bstore);
+    for (let i=0; i < MAXHOUSES; i++) {
+        const newhouse = board.addHouse(`A${i}`);
+        newhouse.addEventListener("click", (e) => {
+            board.beanSpread(e);
+        });
+        // A houses in reverse order so links rotate counterclockwise on board
+        Afield.insertBefore(newhouse, Afield.childNodes[0]);
+    }
+    // linked list to linked loop
+    board.getLastHouse().next = board.first;
+}
+
+main();

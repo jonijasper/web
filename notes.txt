@@ -1,11 +1,16 @@
-let vs var
+let vs var vs const
 
-var 
-global when declared outside of function
-function scoped when declared inside of function
-can be re-declared and updated
+var
+scope: where declared
+re-declare: yes
+update value: yes
 
 let
-block scoped {this is a block}
-cannot be re-declared in the same block
-can be updated (within the block)
+scope: block {this is a block}
+re-declare: no, within block
+update value: yes, within block
+
+const
+scope: block
+re-declare: no, within block
+update value: no

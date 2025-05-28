@@ -16,7 +16,7 @@ const Afield = document.getElementById("A-field");
 const Bfield = document.getElementById("B-field");
 const Astore = document.getElementById("A-store");
 const Bstore = document.getElementById("B-store");
-const textbox = document.getElementById("message");
+const textbox = document.getElementById("mrbeans");
 
 // classes
 class House {

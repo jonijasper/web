@@ -3,7 +3,7 @@
 //   beans from opposite house
 // - handle player turns and prevent clicking opponents houses (done?)
 
-const DEBUG = true;
+const DEBUG = false;
 const INITBEANS = 4;
 const MAXHOUSES = 6;
 document.documentElement.style.setProperty('--n-houses', MAXHOUSES);
@@ -146,6 +146,8 @@ class HouseList {
                     }
 
                     beantext.textContent = mrBeans;
+
+
 
                 }
 

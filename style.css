@@ -14,7 +14,8 @@
     --n-houses: 0;
     --grid-gap: 1vw;
     --padding: 1vw;
-    --aspect-ratio: calc(var(--n-houses+2)/2);
+    --aspect-ratio: 1;
+    --corners: 10px;
 }
 
 .header {
@@ -23,7 +24,7 @@
 
 #gameboard {
     display: grid;
-    grid-template-areas: 
+    grid-template-areas:
         "As Af Bs"
         "As Bf Bs";
     grid-template-columns: 1fr 6fr 1fr;
@@ -31,9 +32,9 @@
     gap: var(--grid-gap);
 }
 
-#A-store { grid-area: As }
+#AS { grid-area: As }
+#BS { grid-area: Bs }
 #A-field { grid-area: Af }
-#B-store { grid-area: Bs }
 #B-field { grid-area: Bf }
 
 .field {
@@ -44,24 +45,33 @@
 
 .house {
     display: flex;
+    align-items: center;
     align-content: center;
     justify-content: center;
     background-color: grey;
     cursor: pointer;
+    border-radius: var(--corners);
 }
 
 .store {
+    aspect-ratio: var(--aspect-ratio)/4;
+    margin: auto 0;
     display: flex;
-    align-content: center;
+    align-items: center;
     justify-content: center;
     background-color: grey;
     cursor: default;
+    border-radius: var(--corners);
 }
 
 
 #message {
-    text-align: center;
-    margin: 80% 50% 10% 25%;
+    width: fit-content;
+    padding: 5px;
+    text-align: left;
     border: 2px solid black;
+    border-radius: 10px;
+    background-color: #f8f8f8;
+    margin: 10px;
 }
 

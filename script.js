@@ -1,9 +1,4 @@
-// TODO:
-// - when landing on empty house on homefield, get opponents
-//   beans from opposite house
-// - handle player turns and prevent clicking opponents houses (done?)
-
-const DEBUG = false;
+const DEBUG = true;
 const INITBEANS = 4;
 const MAXHOUSES = 6;
 document.documentElement.style.setProperty('--n-houses', MAXHOUSES);
@@ -107,70 +102,99 @@ class HouseList {
         }
     }
 
+    updateHouseElement(house, handBeans) {
+        const houseEl = document.getElementById(house.ID);
+        houseEl.value = house.beans;
+        houseEl.textContent = house.beans;
+        beantext.textContent = handBeans;
+
+        // debugline
+        if (DEBUG) {
+            houseEl.textContent += ` / ${house.ID}`;
+        }
+    }
+
     async beanSpread(e) {
         if (BLOCKED) { return; }
         BLOCKED = true;
 
-        const clickedHouse = e.target;
+        let house = this.getHouseById(e.target.id);
+        let mrBeans = house.beans;
 
-        if (ATURN && clickedHouse.id.startsWith("B")) {
-            beantext.textContent = "NOT YOUR TURN MRS BEANS";
-        } else if (!ATURN && clickedHouse.id.startsWith("A")) {
-            beantext.textContent = "NOT YOUR TURN MR BEANS";
-        } else {
-            let house = this.getHouseById(clickedHouse.id);
-            let mrBeans = house.beans;
+        if (mrBeans > 0) {
+            // empty the house
+            house.beans = 0;
+            this.updateHouseElement(house, mrBeans);
 
-            if (mrBeans > 0) {
-                beantext.textContent = mrBeans;
+            // spread the beans
+            while (mrBeans) {
+                await delay();
+                house = house.next;
+                house.beans++;
+                mrBeans--;
 
-                // empty the house
-                house.beans = 0;
-                clickedHouse.value = 0;
-                clickedHouse.textContent = 0;
-
-                // spread the beans
-                while (mrBeans) {
-                    await delay();
-                    house = house.next;
-                    house.beans++;
-                    mrBeans--;
-
-                    const houseEl = document.getElementById(house.ID);
-                    houseEl.value = house.beans;
-                    houseEl.textContent = house.beans;
-
-                    // debugline
-                    if (DEBUG) {
-                        houseEl.textContent += ` / ${house.ID}`;
-                    }
-
-                    beantext.textContent = mrBeans;
-
-
-
-                }
-
-                ATURN = !ATURN;
-                if (ATURN) {
-                    textbox.textContent = "MR Beans: ";
-                } else {
-                    textbox.textContent = "MRS Beans: ";
-                }
-
-            } else {
-                beantext.textContent = "NO BEANS :(";
+                this.updateHouseElement(house, mrBeans);
             }
+
+            if ( (ATURN && house.ID.startsWith("B")) || (!ATURN && house.ID.startsWith("A")) ) {
+                ATURN = !ATURN;
+            } else {
+                const houseNumber = house.ID.slice(-1);
+                if (houseNumber != 'S') {
+                    if (house.beans == 1) {
+                        // empty the house
+                        await delay();
+                        mrBeans = house.beans;
+                        house.beans = 0;
+                        this.updateHouseElement(house, mrBeans);
+
+                        // check if player gets to steal beans from opposite house
+                        const oppositeNum = MAXHOUSES - houseNumber - 1;
+                        let oppositeHouse = null;
+                        let home = null;
+                        if (ATURN) {
+                            oppositeHouse = this.getHouseById(`B${oppositeNum}`);
+                            home = this.getHouseById("AS");
+                        } else {
+                            oppositeHouse = this.getHouseById(`A${oppositeNum}`);
+                            home = this.getHouseById("BS");
+                        }
+                        if (oppositeHouse.beans > 0) {
+                            // empty the opposite house
+                            await delay();
+                            mrBeans += oppositeHouse.beans;
+                            oppositeHouse.beans = 0;
+                            this.updateHouseElement(oppositeHouse, mrBeans);
+                        }
+                        // move beans to the store
+                        await delay();
+                        home.beans += mrBeans;
+                        mrBeans = 0;
+                        this.updateHouseElement(home, mrBeans);
+                    }
+                    ATURN = !ATURN;
+                }
+            }
+        } else {
+            beantext.textContent = "NO BEANS :(";
         }
 
+        if (ATURN) {
+            textbox.textContent = "MR Beans: ";
+        } else {
+            textbox.textContent = "MRS Beans: ";
+        }
         BLOCKED = false;
     }
 }
 
 function reset() {
+    if (BLOCKED) { return; }
     Afield.innerHTML = "";
     Bfield.innerHTML = "";
     beantext.textContent = "-";
+    ATURN = true;
+    textbox.textContent = "MR Beans: ";
     main();
 }
 
@@ -189,7 +213,11 @@ function main() {
     for (let i=0; i < MAXHOUSES; i++) {
         const newhouse = board.addHouse(`B${i}`);
         newhouse.addEventListener("click", (e) => {
-            board.beanSpread(e);
+            if (!ATURN) {
+                board.beanSpread(e);
+            } else {
+                beantext.textContent = "NOT YOUR TURN MRS BEANS";
+            }
         });
 
         Bfield.appendChild(newhouse);
@@ -200,7 +228,11 @@ function main() {
     for (let i=0; i < MAXHOUSES; i++) {
         const newhouse = board.addHouse(`A${i}`);
         newhouse.addEventListener("click", (e) => {
-            board.beanSpread(e);
+            if (ATURN) {
+                board.beanSpread(e);
+            } else {
+                beantext.textContent = "NOT YOUR TURN MR BEANS";
+            }
         });
         // A houses in reverse order so links rotate counterclockwise on board
         Afield.insertBefore(newhouse, Afield.childNodes[0]);

@@ -1,0 +1,9 @@
+TODO:
+- highlight side of the board whose turn it is
+
+Doing:
+
+Done:
+- handle player turns and prevent clicking opponents houses
+- when landing on empty house on homefield, get opponents
+beans from opposite house
